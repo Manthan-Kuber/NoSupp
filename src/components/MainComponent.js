@@ -1,4 +1,4 @@
-import { React, Component } from "react";
+import { React, useEffect, useState } from "react";
 import { Card, Col, Row } from "antd";
 import {
   HeartOutlined,
@@ -10,39 +10,76 @@ import {
 } from "@ant-design/icons";
 const { Meta } = Card;
 
+const RenderCardDescription = (email,phone,website) => {
+  return (
+    <Row>
+      <Col span={24}>
+        <p>
+          <MailOutlined style={{ fontSize: 18 }} /> {email}{" "}
+        </p>
+      </Col>
+      <Col span={24}>
+        <p>
+          <PhoneOutlined style={{ fontSize: 18 }} /> {phone}
+        </p>
+      </Col>
+      <Col span={24}>
+        <p>
+          <GlobalOutlined style={{ fontSize: 18 }} /> {website}{" "}
+        </p>
+      </Col>
+    </Row>
+  );
+};
+
+
 function Main() {
+  const [users, setUsers] = useState([]);
+  const getUsers = async () => {
+    const response = await fetch("https://jsonplaceholder.typicode.com/users");
+    setUsers(await response.json());
+  };
+  useEffect(() => {
+    getUsers();
+  }, []); //Dependency list to prevent infinite loop
+
   
   return (
     <>
       <Row>
-          <Col className="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-8 ant-col-lg-8 ant-col-xl-6" span={6}>
-            <Card
-              style={{ margin: 15 }}
-              cover={
-                <img
-                  alt="Glenna Richert"
-                  src="https://avatars.dicebear.com/v2/avataaars/Delphine.svg?options[mood][]=happy"
-                  style={{
-                    background: "#ececec",
-                    width: "100%",
-                    height: "200px",
-                  }}
-                />
-              }
-              actions={[
-                <HeartOutlined style={{ color: "#eb2f96" }} />,
-                <EditOutlined key="edit" />,
-                <DeleteFilled key="delete" />,
-              ]}
-            >
-              <Meta title="Glenna Richert"  />
-              <div className='additional'>
-                <MailOutlined />
-                <PhoneOutlined />
-                <GlobalOutlined/>
-              </div>
-            </Card>
-          </Col>
+        {users.map((currentUser) => {
+          const pfpURL = `https://avatars.dicebear.com/v2/avataaars/${currentUser.username}.svg?options[mood][]=happy`
+          return (
+            <>
+              <Col lg={8} md={8} sm={24} xl={6} xs={24} span={6}>
+                <Card
+                  style={{ margin: 15 }}
+                  cover={
+                    <img
+                      alt={currentUser.name}
+                      src={pfpURL}
+                      style={{
+                        background: "#ececec",
+                        width: "100%",
+                        height: "200px",
+                      }}
+                    />
+                  }
+                  actions={[
+                    <HeartOutlined style={{ color: "#eb2f96" }} />,
+                    <EditOutlined key="edit" />,
+                    <DeleteFilled key="delete" />,
+                  ]}
+                >
+                  <Meta
+                    title={currentUser.name}
+                    description={RenderCardDescription(currentUser.email,currentUser.phone,currentUser.website)}
+                  />
+                </Card>
+              </Col>
+            </>
+          );
+        })}
         {/* --------------------------------------------------- */}
       </Row>
     </>
@@ -50,5 +87,3 @@ function Main() {
 }
 
 export default Main;
-
-<img alt="Avatar" style="width: 200px; height: 200px;"></img>;
