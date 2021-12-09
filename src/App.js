@@ -1,5 +1,4 @@
 import "./App.css";
-import { Loading } from "./components/LoadingComponent";
 import Main from "./components/MainComponent";
 
 function App() {

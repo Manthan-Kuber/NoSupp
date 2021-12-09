@@ -1,7 +1,6 @@
 import { React, useEffect, useState } from "react";
 import { Form,Input,Modal, Card, Col, Row } from "antd";
 import {
-  HeartTwoTone,
   EditOutlined,
   DeleteFilled,
   MailOutlined,
@@ -9,6 +8,7 @@ import {
   GlobalOutlined,
   HeartFilled,
 } from "@ant-design/icons";
+import { Loading } from "./LoadingComponent";
 const { Meta } = Card;
 
 const RenderCardDescription = (email, phone, website) => {
@@ -36,17 +36,32 @@ const RenderCardDescription = (email, phone, website) => {
 function Main() {
   const [users, setUsers] = useState([]);
   const [isLiked, setIsLiked] = useState(false);
+  const [isLoading,setIsLoading] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [formValues,setFormValues] = useState({
+    name:'',
+    email:'',
+    phone:'',
+    website:'',
+  });
   const getUsers = async () => {
     const response = await fetch("https://jsonplaceholder.typicode.com/users");
     setUsers(await response.json());
   };
   useEffect(() => {
     getUsers();
+    setTimeout(() => {
+      setIsLoading(false);
+    },2000)
   }, []); //Dependency list to prevent infinite loop
-  const likeColor = isLiked ? "red" : "gray";
-  const showModal = () => {
+  const showModal = (currentUser) => {
     setIsModalVisible(true);
+    setFormValues({
+      name: currentUser.name,
+      email: currentUser.email,
+      phone: currentUser.phone,
+      website: currentUser.website,
+    })
   };
 
   const handleOk = () => {
@@ -63,6 +78,7 @@ function Main() {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
+  const likeColor = isLiked ? "red" : "gray";
   const usersList = users.map((currentUser) => {
     return (
       <Col key={currentUser.id} lg={8} md={8} sm={24} xl={6} xs={24} span={6}>
@@ -85,7 +101,7 @@ function Main() {
               onClick={() => setIsLiked(!isLiked)}
               style={{ color: likeColor }}
             />,
-            <EditOutlined key="edit" onClick={showModal} />,
+            <EditOutlined key="edit" onClick={() => showModal(currentUser)} />,
             <DeleteFilled key="delete" />,
           ]}
         >
@@ -101,47 +117,93 @@ function Main() {
       </Col>
     );
   });
-  return (
-    <>
-      <Row>{usersList}</Row>
-      <Modal
-        title="Basic Modal"
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
+  if(isLoading){
+    return(
+      <Loading />
+      );
+  }
+  else{
+    return (
+      <>
+        <Row>{usersList}</Row>
+        <Modal
+          title="Basic Modal"
+          visible={isModalVisible}
+          onOk={handleOk}
+          onCancel={handleCancel}
+        >
+          <Form
+        name="basic"
+        labelCol={{
+          span: 8,
+        }}
+        wrapperCol={{
+          span: 16,
+        }}
+        initialValues={{
+          remember: true,
+        }}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+        autoComplete="off"
       >
-        <Form
-      name="basic"
-      labelCol={{
-        span: 8,
-      }}
-      wrapperCol={{
-        span: 16,
-      }}
-      initialValues={{
-        remember: true,
-      }}
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
-      autoComplete="off"
-    >
-      <Form.Item
-        label="Username"
-        name="username"
-        placeholder="Username"
-        rules={[
-          {
-            required: true,
-            message: 'Please input your username!',
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-    </Form>
-      </Modal>
-    </>
-  );
+        <Form.Item
+          label="Username"
+          name="username"
+          placeholder="Username"
+          rules={[
+            {
+              required: true,
+              message: 'Please input your username!',
+            },
+          ]}
+        >
+          <Input defaultValue={formValues.name} />
+        </Form.Item>
+        <Form.Item
+          label="Email"
+          name="email"
+          placeholder="Email"
+          rules={[
+            {
+              required: true,
+              message: 'Please input your email!',
+            },
+          ]}
+        >
+          <Input defaultValue={formValues.email} />
+        </Form.Item>
+        <Form.Item
+          label="Phone"
+          name="phone"
+          placeholder="Phone"
+          rules={[
+            {
+              required: true,
+              message: 'Please input your phone!',
+            },
+          ]}
+        >
+          <Input defaultValue={formValues.phone} />
+        </Form.Item>
+        <Form.Item
+          label="Website"
+          name="website"
+          placeholder="Website"
+          rules={[
+            {
+              required: true,
+              message: 'Please input your website!',
+            },
+          ]}
+        >
+          <Input defaultValue={formValues.website} />
+        </Form.Item>
+      </Form>
+        </Modal>
+      </>
+    );
+  }
 }
 
 export default Main;
