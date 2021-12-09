@@ -78,6 +78,12 @@ function Main() {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
+  const handleDelete = (userId) =>{
+      const newUsers = [...users];
+      const index = users.findIndex((user) => user.id === userId)
+      newUsers.splice(index,1);
+      setUsers(newUsers);
+  }
   const likeColor = isLiked ? "red" : "gray";
   const usersList = users.map((currentUser) => {
     return (
@@ -102,7 +108,7 @@ function Main() {
               style={{ color: likeColor }}
             />,
             <EditOutlined key="edit" onClick={() => showModal(currentUser)} />,
-            <DeleteFilled key="delete" />,
+            <DeleteFilled key="delete" onClick={() => handleDelete(currentUser.id) } />,
           ]}
         >
           <Meta
