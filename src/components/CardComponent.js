@@ -159,6 +159,10 @@ export default function CardComponent({ currentUser,handleDelete,handleEdit }) {
                 required: true,
                 message: "Please input your email!",
               },
+              {
+                type:"email",
+                message:"Not a valid email"
+              }
             ]}
           >
             <Input defaultValue={formValues.email} onChange={(event) => setFormValues({
